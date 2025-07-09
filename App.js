@@ -1,139 +1,106 @@
-// import { useState } from 'react';
+import GoalItem from './components/GoalItens';
+import GoalInput from './components/GoalInputs';
+import { StatusBar } from 'expo-status-bar';
 
-// import { StyleSheet, Text, View, Button, TextInput, ScrollView, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, Button, image } from 'react-native';
 
-// export default function App() {
-//   const [enteredGoalText, setEnteredGoalText] = useState('')
-//   const [courseGoals, setcourseGoals] = useState([])
-
-//   function goalInputHandle(enteredText){
-//       setEnteredGoalText(enteredText)
-//   }
-
-//   function addGoalHandle() {
-//       setcourseGoals(currentCourseGoals => [...currentCourseGoals,
-//         {text: enteredGoalText, id: Date.now().toString() },
-//         ]);
-//   }
-
-//   return (
-//     <View style={styles.appContainer}>
-//   <View style={styles.inputContainer}>
-//     <TextInput
-//       placeholder="Seu Objetivo"
-//       style={styles.textInput}
-//       onChangeText={goalInputHandle}
-//     />
-//     <Button onPress={addGoalHandle} title="Novo Objetivo" />
-//   </View>
-//   <View style={styles.golContainer}>
-//     <FlatList 
-//     data={courseGoals}  
-//     renderItem={itemData => {
-//       itemData.index
-//       return (
-//       <View style={styles.goalItem}>
-//         <Text style={styles.goalText}>{itemData.item.text}</Text>
-//       </View>
-//     )
-//   }} 
-//   keyExtractor={(item, index) => {
-//     return item.id
-//   }}
-//     alwaysBounceHorizontal={false}
-//     />
-//   </View>
-// </View>
-
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   appContainer: {
-//     flex: 1,
-//     padding: 50,
-//     paddingHorizontal: 16,
-
-    
-//   },
-//   inputContainer: {
-//     flex: 1,
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: 24,
-//     borderBottomWidth: 1,
-//     borderBottomColor: "#CCCCCC"
-    
-//   },
-//   textInput:{
-//       borderWidth: 1,
-//       borderColor: '#CCCCCC',
-//       width: '65%',
-//       marginRight: 8,
-//       padding: 8
-//   },
-//   golContainer: {
-//     flex: 5,
-//   },
-//   goalItem: {
-//     margin: 8,
-//     padding: 8,
-//     borderRadius: 6,
-//     backgroundColor: '#5e0acc',
-//     color: 'white'
-
-//   },
-//   goalText: {
-//     color: 'white'
-//   }
-// });
+import { useEffect } from 'react';
 
 import { useState } from 'react';
 
-import { GoalItem } from './components/GoalItens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { StyleSheet, View, Button, TextInput, FlatList } from 'react-native';
+import { endEvent } from 'react-native/Libraries/Performance/Systrace';
+
 
 export default function App() {
-  const [enteredGoalText, setEnteredGoalText] = useState('')
+  const [modalVisibility, setmodalVisibility] = useState(false)
   const [courseGoals, setcourseGoals] = useState([])
 
-  function goalInputHandle(enteredText){
-      setEnteredGoalText(enteredText)
+
+  useEffect(() => {
+    async function loadGoals() {
+      try {
+        const storedGoals = await AsyncStorage.getItem('goals');
+        if (storedGoals) {
+          setcourseGoals(JSON.parse(storedGoals));
+        }
+      } catch (error) {
+        console.error('Erro ao carregar objetivos:', error);
+      }
+    }
+    loadGoals();
+  }, []);
+
+
+
+  function startAddGoalHandle() {
+    setmodalVisibility(true)
   }
 
-  function addGoalHandle() {
-      setcourseGoals(currentCourseGoals => [...currentCourseGoals,
-        {text: enteredGoalText, id: Date.now().toString() },
-        ]);
+  function endAddGoalHandle() {
+    setmodalVisibility(false)
   }
+
+ 
+  async function addGoalHandle(goalText) {
+    try {
+      const newGoal = { text: goalText, id: Date.now().toString() };
+      const updatedGoals = [...courseGoals, newGoal];
+      setcourseGoals(updatedGoals);
+      await AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
+    } catch (error) {
+      console.error('Erro ao salvar objetivo:', error);
+    }
+    endAddGoalHandle()
+  }
+  
+  
+
+
+  async function deleteGoalHandler(id) {
+    try {
+      const updatedGoals = courseGoals.filter((goal) => goal.id !== id);
+      setcourseGoals(updatedGoals);
+      await AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
+    } catch (error) {
+      console.error('Erro ao excluir objetivo:', error);
+    }
+  }
+  
+
 
   return (
-    <View style={styles.appContainer}>
-  <View style={styles.inputContainer}>
-    <TextInput
-      placeholder="Seu Objetivo"
-      style={styles.textInput}
-      onChangeText={goalInputHandle}
-    />
-    <Button onPress={addGoalHandle} title="Novo Objetivo" />
-  </View>
-  <View style={styles.golContainer}>
-    <FlatList 
-    data={courseGoals}  
-    renderItem={itemData => {
-      itemData.index
-      return <GoalItem/>
-      
-  }} 
-  keyExtractor={(item, index) => {
-    return item.id
-  }}
-    alwaysBounceHorizontal={false}
-    />
-  </View>
-</View>
+    <>
+      <StatusBar style="auto" />
+      <View style={styles.appContainer}>
+
+        <View style={styles.button}>
+          <Button title="Adicionar tópico de convrsa" color={"#a065ec"} onPress={startAddGoalHandle} />
+        </View>
+        <GoalInput visible={modalVisibility} onAddGoal={addGoalHandle} onCancel={endAddGoalHandle} />
+        <View style={styles.goalsContainer}>
+          <FlatList
+            data={courseGoals}
+            renderItem={itemData => {
+              itemData.index
+              return (
+                <GoalItem
+                  id={itemData.item.id}
+                  text={itemData.item.text}
+                  onDeleteItem={deleteGoalHandler}
+                />
+              )
+
+            }}
+            keyExtractor={(item, index) => {
+              return item.id
+            }}
+            alwaysBounceHorizontal={false}
+          />
+        </View>
+      </View>
+    </>
 
   );
 }
@@ -142,28 +109,13 @@ const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
     padding: 50,
-    paddingHorizontal: 16,
-
-    
+    paddingHorizontal: 16
   },
-  inputContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "#CCCCCC"
-    
-  },
-  textInput:{
-      borderWidth: 1,
-      borderColor: '#CCCCCC',
-      width: '65%',
-      marginRight: 8,
-      padding: 8
-  },
-  golContainer: {
+  goalsContainer: {
     flex: 5,
+
+  },
+  button: {
+    marginTop: 20
   }
 });

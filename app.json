@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "platforms": ["ios", "android", "web"],
     "backgroundColor": "#1e085a",
     "splash": {
       "image": "./assets/splash.png",
@@ -14,9 +15,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -34,6 +33,7 @@
       "eas": {
         "projectId": "b35bfe3c-b75a-44e7-afd4-49a56b93825b"
       }
-    }
+    },
+    "owner": "jonathanrebello01"
   }
 }

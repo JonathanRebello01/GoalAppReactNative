@@ -76,7 +76,7 @@ export default function App() {
       <View style={styles.appContainer}>
 
         <View style={styles.button}>
-          <Button title="Adicionar tópico de convrsa" color={"#a065ec"} onPress={startAddGoalHandle} />
+          <Button title="Adicionar Ojetivo" color={"#a065ec"} onPress={startAddGoalHandle} />
         </View>
         <GoalInput visible={modalVisibility} onAddGoal={addGoalHandle} onCancel={endAddGoalHandle} />
         <View style={styles.goalsContainer}>
@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
     padding: 50,
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    backgroundColor: '#1e085a'
   },
   goalsContainer: {
     flex: 5,

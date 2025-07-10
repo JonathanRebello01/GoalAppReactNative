@@ -19,7 +19,8 @@ function GoalInput(props) {
       <View style={styles.inputContainer}>
         <Image source={require('../assets/images/sticky-note.png')} style={styles.image} />
         <TextInput
-          placeholder="Seu Tópico"
+          placeholder="Seu Objetivo
+          "
           style={styles.textInput}
           onChangeText={goalInputHandle}
           value={enteredGoalText}
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     flexDirection: "row"
   },
   button: {
-    width: "40%",
+    width: "50%",
     marginHorizontal: 8  
   },
 });

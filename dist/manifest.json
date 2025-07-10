@@ -2,8 +2,8 @@
   "background_color": "#ffffff",
   "display": "standalone",
   "lang": "en",
-  "name": "RNCourse",
-  "short_name": "RNCourse",
+  "name": "To Talk",
+  "short_name": "To Talk",
   "start_url": "/?utm_source=web_app_manifest",
   "orientation": "portrait",
   "related_applications": [
